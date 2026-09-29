@@ -2,20 +2,27 @@ import { Conta } from './Conta.js';
 import { ContaCorrente } from './ContaCorrente.js';
 import { ContaPoupanca } from './ContaPoupanca.js';
 
-const cc = new ContaCorrente('0001', 'Ana Lima', 500);
-const cp = new ContaPoupanca('0002', 'Bruno Souza');
+const contas = [
+    new ContaCorrente('0001', 'Ana Lima', 500),
+    new ContaPoupanca('0002', 'Bruno Souza'),
+];
 
-cc.depositar(100); // depositar() foi herdado de Conta
-cc.sacar(400); // só passa por causa do limite
-console.log('CC saldo:', cc.saldo);
+contas.forEach((c) => c.depositar(1000));
 
-cp.depositar(1000);
-console.log('Rendeu:', cp.render(), '→ saldo:', cp.saldo);
-
-try {
-    cp.sacar(5000); // poupança não tem limite
-} catch (e) {
-    console.log('Poupança →', e.message);
+// Mesma mensagem, respostas diferentes: quem decide é o objeto, não um if
+function fecharMes(listaDeContas) {
+    for (const conta of listaDeContas) {
+        const tarifa = conta.tarifaMensal();
+        if (tarifa > 0) conta.sacar(tarifa);
+        console.log(`${conta} (tarifa: R$ ${tarifa.toFixed(2)})`);
+    }
 }
 
-console.log(cc instanceof ContaCorrente, cc instanceof Conta);
+fecharMes(contas);
+
+// A abstração protegida: ninguém cria uma "conta genérica"
+try {
+    new Conta('0003', 'Carla Dias');
+} catch (e) {
+    console.log('Erro esperado →', e.message);
+}

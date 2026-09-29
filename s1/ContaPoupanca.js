@@ -5,6 +5,9 @@ export class ContaPoupanca extends Conta {
         super(numero, titular);
         this.taxaMensal = taxaMensal;
     }
+    tarifaMensal() {
+        return 0;
+    }
 
     // comportamento que só a poupança tem
     render() {

@@ -3,8 +3,11 @@ export class Conta {
     #titular;
 
     constructor(numero, titular) {
+        if (new.target === Conta) {
+            throw new Error('Conta é abstrata: crie ContaCorrente ou ContaPoupanca');
+        }
         this.numero = numero;
-        this.titular = titular; // passa pelo setter abaixo
+        this.titular = titular;
     }
 
     // getter: leitura liberada. Não há setter: escrever, só por depositar/sacar
@@ -42,5 +45,13 @@ export class Conta {
         if (!(valor > 0)) throw new Error('Saque deve ser positivo');
         if (valor > this.saldoDisponivel()) throw new Error('Saldo insuficiente'); // ← mudou
         this.#saldo -= valor;
+    }
+    tarifaMensal() {
+        throw new Error('tarifaMensal() precisa ser implementado na subclasse');
+    }
+
+    // sobrescrevendo um método que veio de Object.prototype
+    toString() {
+        return `${this.constructor.name} ${this.numero} · ${this.titular} · R$ ${this.saldo.toFixed(2)}`;
     }
 }
