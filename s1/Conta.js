@@ -34,4 +34,13 @@ export class Conta {
         if (valor > this.#saldo) throw new Error('Saldo insuficiente');
         this.#saldo -= valor;
     }
+    saldoDisponivel() {
+        return this.#saldo;
+    }
+
+    sacar(valor) {
+        if (!(valor > 0)) throw new Error('Saque deve ser positivo');
+        if (valor > this.saldoDisponivel()) throw new Error('Saldo insuficiente'); // ← mudou
+        this.#saldo -= valor;
+    }
 }
