@@ -127,10 +127,10 @@ classDiagram
     SaleService ..> ISaleRepository
     SaleService ..> IProductRepository
 
-Entidade,     Quem cuida da regra (Service),       Quem cuida dos dad(Repository)
-Category      CategoryService ,ICategoryRepository CategoryRepository
-Item          itemService                           ItemRepository 
-Sale          SaleService                          ISaleRepository / SaleRepository 
+    Entidade,     Quem cuida da regra (Service),       Quem cuida dos dad(Repository)
+    Category      CategoryService ,ICategoryRepository CategoryRepository
+    Item          itemService                           ItemRepository 
+    Sale          SaleService                          ISaleRepository / SaleRepository 
 
     SRP: Cada classe de modelo guarda apenas os seus dados, os Services cuidam apenas das regras de negócio e validações, e os Repositories cuidam exclusivamente do salvamento/busca de dados.
 
