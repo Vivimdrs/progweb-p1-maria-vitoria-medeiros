@@ -1,0 +1,15 @@
+body {
+  min-height: 100vh;
+}
+
+.card {
+  border: none;
+  border-radius: 0.75rem;
+}
+
+.table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

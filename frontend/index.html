@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bazar &amp; Brechó — Gestão de Catálogo</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+    crossorigin="anonymous"
+  />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="bg-light">
+  <header class="bg-dark text-white py-3 mb-4 shadow-sm">
+    <div class="container">
+      <h1 class="h4 mb-0">Bazar &amp; Brechó Comunitário — Catálogo</h1>
+    </div>
+  </header>
+
+  <main class="container pb-5">
+    <div id="area-aviso" class="mb-3"></div>
+
+    <!-- SEÇÃO 1: CATEGORIAS -->
+    <div class="row g-4 mb-5">
+      <section class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 id="cat-titulo-form" class="h5 card-title mb-3">Nova Categoria</h2>
+            <form id="form-categoria" novalidate>
+              <input type="hidden" id="categoria-id" name="id" />
+
+              <div class="mb-3">
+                <label for="cat-nome" class="form-label">Nome</label>
+                <input type="text" id="cat-nome" name="nome" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="cat-descricao" class="form-label">Descrição</label>
+                <input type="text" id="cat-descricao" name="descricao" class="form-control" required />
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark">Salvar Categoria</button>
+                <button type="button" id="btn-cancelar-cat" class="btn btn-outline-secondary d-none">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 card-title mb-0">Categorias Cadastradas</h2>
+              <button type="button" id="btn-recarregar-cat" class="btn btn-sm btn-outline-dark">
+                Recarregar
+              </button>
+            </div>
+
+            <div id="cat-estado-carregando" class="text-center py-4 d-none">
+              <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+              <p class="text-muted mt-2 mb-0">Carregando categorias...</p>
+            </div>
+
+            <div id="cat-estado-erro" class="alert alert-danger d-none" role="alert"></div>
+
+            <div id="cat-estado-vazio" class="alert alert-secondary text-center d-none">
+              Nenhuma categoria cadastrada.
+            </div>
+
+            <div id="cat-estado-sucesso" class="table-responsive d-none">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th class="text-end">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-categorias"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <hr class="my-4" />
+
+    <!-- SEÇÃO 2: PRODUTOS -->
+    <div class="row g-4">
+      <section class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 id="prod-titulo-form" class="h5 card-title mb-3">Novo Produto</h2>
+            <form id="form-produto" novalidate>
+              <input type="hidden" id="produto-id" name="id" />
+
+              <div class="mb-3">
+                <label for="prod-titulo" class="form-label">Título do Item</label>
+                <input type="text" id="prod-titulo" name="titulo" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="prod-preco" class="form-label">Preço (R$)</label>
+                <input type="number" step="0.01" id="prod-preco" name="preco" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="prod-condicao" class="form-label">Condição</label>
+                <select id="prod-condicao" name="condicao" class="form-select" required>
+                  <option value="Novo">Novo</option>
+                  <option value="Usado - Excelente">Usado - Excelente</option>
+                  <option value="Usado - Bom" selected>Usado - Bom</option>
+                  <option value="Usado - Regular">Usado - Regular</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="prod-categoriaId" class="form-label">Categoria</label>
+                <select id="prod-categoriaId" name="categoriaId" class="form-select" required></select>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                <button type="button" id="btn-cancelar-prod" class="btn btn-outline-secondary d-none">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+              <h2 class="h5 card-title mb-0">Produtos no Catálogo</h2>
+              <div class="d-flex gap-2">
+                <select id="filtro-categoria" class="form-select form-select-sm" aria-label="Filtrar por categoria"></select>
+                <button type="button" id="btn-recarregar-prod" class="btn btn-sm btn-outline-primary">
+                  Recarregar
+                </button>
+              </div>
+            </div>
+
+            <div id="prod-estado-carregando" class="text-center py-4 d-none">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+              <p class="text-muted mt-2 mb-0">Carregando produtos...</p>
+            </div>
+
+            <div id="prod-estado-erro" class="alert alert-danger d-none" role="alert"></div>
+
+            <div id="prod-estado-vazio" class="alert alert-secondary text-center d-none">
+              Nenhum produto encontrado para o filtro selecionado.
+            </div>
+
+            <div id="prod-estado-sucesso" class="table-responsive d-none">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Preço</th>
+                    <th>Condição</th>
+                    <th>Categoria</th>
+                    <th class="text-end">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-produtos"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
