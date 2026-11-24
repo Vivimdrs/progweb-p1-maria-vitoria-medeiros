@@ -1,4 +1,5 @@
 import * as categoriaModel from '../models/categoriaModel.js';
+import * as produtoModel from '../models/produtoModel.js';
 import { criarErro } from '../utils/erro.js';
 
 export function listar() {
@@ -38,6 +39,13 @@ export function atualizar(id, { nome, descricao }) {
 }
 
 export function remover(id) {
-  const removida = categoriaModel.remover(id);
-  if (!removida) throw criarErro(404, 'Categoria não encontrada.');
+  const existente = categoriaModel.buscarPorId(id);
+  if (!existente) throw criarErro(404, 'Categoria não encontrada.');
+
+  const produtosVinculados = produtoModel.listarTodos(id);
+  if (produtosVinculados.length > 0) {
+    throw criarErro(409, 'Não é possível remover categoria que possui produtos vinculados.');
+  }
+
+  categoriaModel.remover(id);
 }
