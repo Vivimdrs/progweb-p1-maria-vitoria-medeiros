@@ -1,37 +1,39 @@
-let categorias = [
-  { id: 1, nome: 'Roupas', descricao: 'Vestuário masculino, feminino e infantil' },
-  { id: 2, nome: 'Calçados', descricao: 'Tênis, sapatos, sandálias e botas' }
-];
-let proximoId = 3;
+import db from '../db.js';
 
 export function listarTodas() {
-  return categorias;
+  return db.prepare('SELECT id, nome, descricao FROM categorias').all();
 }
 
 export function buscarPorId(id) {
-  return categorias.find((c) => c.id === id);
+  return db.prepare('SELECT id, nome, descricao FROM categorias WHERE id = ?').get(id);
 }
 
 export function buscarPorNome(nome) {
-  return categorias.find((c) => c.nome.toLowerCase() === nome.trim().toLowerCase());
+  return db
+    .prepare('SELECT id, nome, descricao FROM categorias WHERE LOWER(nome) = LOWER(?)')
+    .get(nome.trim());
 }
 
-export function criar(dados) {
-  const nova = { id: proximoId++, ...dados };
-  categorias.push(nova);
-  return nova;
+export function criar({ nome, descricao }) {
+  const resultado = db
+    .prepare('INSERT INTO categorias (nome, descricao) VALUES (?, ?)')
+    .run(nome, descricao);
+  return buscarPorId(Number(resultado.lastInsertRowid));
 }
 
-export function atualizar(id, dados) {
-  const index = categorias.findIndex((c) => c.id === id);
-  if (index === -1) return null;
-  categorias[index] = { ...categorias[index], ...dados, id };
-  return categorias[index];
+export function atualizar(id, { nome, descricao }) {
+  const existente = buscarPorId(id);
+  if (!existente) return null;
+
+  db.prepare('UPDATE categorias SET nome = ?, descricao = ? WHERE id = ?').run(
+    nome,
+    descricao,
+    id
+  );
+  return buscarPorId(id);
 }
 
 export function remover(id) {
-  const index = categorias.findIndex((c) => c.id === id);
-  if (index === -1) return false;
-  categorias.splice(index, 1);
-  return true;
+  const resultado = db.prepare('DELETE FROM categorias WHERE id = ?').run(id);
+  return resultado.changes > 0;
 }

@@ -1,36 +1,39 @@
-let produtos = [
-  { id: 1, titulo: 'Jaqueta Jeans Vintage', preco: 45.0, condicao: 'Usado - Bom', categoriaId: 1 },
-  { id: 2, titulo: 'Tênis Cano Alto', preco: 60.0, condicao: 'Novo', categoriaId: 2 }
-];
-let proximoId = 3;
+import db from '../db.js';
 
 export function listarTodos(categoriaId) {
   if (categoriaId) {
-    return produtos.filter((p) => p.categoriaId === categoriaId);
+    return db
+      .prepare('SELECT id, titulo, preco, condicao, categoriaId FROM produtos WHERE categoriaId = ?')
+      .all(Number(categoriaId));
   }
-  return produtos;
+  return db.prepare('SELECT id, titulo, preco, condicao, categoriaId FROM produtos').all();
 }
 
 export function buscarPorId(id) {
-  return produtos.find((p) => p.id === id);
+  return db
+    .prepare('SELECT id, titulo, preco, condicao, categoriaId FROM produtos WHERE id = ?')
+    .get(id);
 }
 
-export function criar(dados) {
-  const novo = { id: proximoId++, ...dados };
-  produtos.push(novo);
-  return novo;
+export function criar({ titulo, preco, condicao, categoriaId }) {
+  const resultado = db
+    .prepare('INSERT INTO produtos (titulo, preco, condicao, categoriaId) VALUES (?, ?, ?, ?)')
+    .run(titulo, preco, condicao, categoriaId);
+  return buscarPorId(Number(resultado.lastInsertRowid));
 }
 
-export function atualizar(id, dados) {
-  const index = produtos.findIndex((p) => p.id === id);
-  if (index === -1) return null;
-  produtos[index] = { ...produtos[index], ...dados, id };
-  return produtos[index];
+export function atualizar(id, { titulo, preco, condicao, categoriaId }) {
+  const existente = buscarPorId(id);
+  if (!existente) return null;
+
+  db.prepare(
+    'UPDATE produtos SET titulo = ?, preco = ?, condicao = ?, categoriaId = ? WHERE id = ?'
+  ).run(titulo, preco, condicao, categoriaId, id);
+
+  return buscarPorId(id);
 }
 
 export function remover(id) {
-  const index = produtos.findIndex((p) => p.id === id);
-  if (index === -1) return false;
-  produtos.splice(index, 1);
-  return true;
+  const resultado = db.prepare('DELETE FROM produtos WHERE id = ?').run(id);
+  return resultado.changes > 0;
 }
