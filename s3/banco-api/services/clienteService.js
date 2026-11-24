@@ -1,5 +1,6 @@
 import * as clienteModel from '../models/clienteModel.js';
 import { criarErro } from '../utils/erro.js';
+import * as contaModel from '../models/contaModel.js';
 
 export function listar() {
   return clienteModel.listarTodos();
@@ -45,6 +46,13 @@ export function atualizar(id, { nome, cpf, email }) {
 }
 
 export function remover(id) {
-  const removido = clienteModel.remover(id);
-  if (!removido) throw criarErro(404, 'Cliente não encontrado.');
+  const existente = clienteModel.buscarPorId(id);
+  if (!existente) throw criarErro(404, 'Cliente não encontrado.');
+
+  const contasDoCliente = contaModel.buscarPorClienteId(id);
+  if (contasDoCliente.length > 0) {
+    throw criarErro(409, 'Não é possível remover cliente que possui contas vinculadas.');
+  }
+
+  clienteModel.remover(id);
 }

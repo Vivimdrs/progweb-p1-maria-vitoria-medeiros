@@ -1,37 +1,35 @@
-let clientes = [
-  { id: 1, nome: 'Ana Silva', cpf: '11122233344', email: 'ana@email.com' },
-  { id: 2, nome: 'Bruno Costa', cpf: '55566677788', email: 'bruno@email.com' }
-];
-let proximoId = 3;
+import db from '../db.js';
 
 export function listarTodos() {
-  return clientes;
+  return db.prepare('SELECT id, nome, cpf, email FROM clientes').all();
 }
 
 export function buscarPorId(id) {
-  return clientes.find((c) => c.id === id);
+  return db.prepare('SELECT id, nome, cpf, email FROM clientes WHERE id = ?').get(id);
 }
 
 export function buscarPorCpf(cpf) {
-  return clientes.find((c) => c.cpf === cpf);
+  return db.prepare('SELECT id, nome, cpf, email FROM clientes WHERE cpf = ?').get(cpf);
 }
 
-export function criar(dados) {
-  const novo = { id: proximoId++, ...dados };
-  clientes.push(novo);
-  return novo;
+export function criar({ nome, cpf, email }) {
+  const resultado = db
+    .prepare('INSERT INTO clientes (nome, cpf, email) VALUES (?, ?, ?)')
+    .run(nome, cpf, email);
+  return buscarPorId(Number(resultado.lastInsertRowid));
 }
 
-export function atualizar(id, dados) {
-  const index = clientes.findIndex((c) => c.id === id);
-  if (index === -1) return null;
-  clientes[index] = { ...clientes[index], ...dados, id };
-  return clientes[index];
+export function atualizar(id, { nome, cpf, email }) {
+  const existente = buscarPorId(id);
+  if (!existente) return null;
+
+  db.prepare('UPDATE clientes SET nome = ?, cpf = ?, email = ? WHERE id = ?')
+    .run(nome, cpf, email, id);
+
+  return buscarPorId(id);
 }
 
 export function remover(id) {
-  const index = clientes.findIndex((c) => c.id === id);
-  if (index === -1) return false;
-  clientes.splice(index, 1);
-  return true;
+  const resultado = db.prepare('DELETE FROM clientes WHERE id = ?').run(id);
+  return resultado.changes > 0;
 }

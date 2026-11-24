@@ -2,6 +2,7 @@ import express from 'express';
 import { logger } from './middleware/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import clientesRouter from './routes/clientes.js';
+import contasRouter from './routes/contas.js';
 import cors from 'cors';
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(express.json());
 app.use(logger);
 
 app.use('/clientes', clientesRouter);
-
+app.use('/contas', contasRouter);
 app.use(errorHandler);
 
 export default app;
